@@ -1,13 +1,12 @@
 import 'package:excel_app/view_model/excel_file_uploaing_view_model.dart';
-import 'package:excel_app/view_model/state_controller.dart';
+import 'package:excel_app/views/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class FileUploadingPage extends StatelessWidget {
-  final ExcelFileUploadingViewModel _excelFileUploadingViewModel =
-      ExcelFileUploadingViewModel();
+  final _excelFileUploadingViewModel = Get.put(ExcelFileUploadingViewModel());
 
-  final StateController _stateController = StateController();
+  // final StateController _stateController = StateController();
 
   FileUploadingPage({super.key});
 
@@ -21,43 +20,49 @@ class FileUploadingPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              height: 100,
-              width: 100,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/image/uploading_image.png"),
-                  opacity: .3,
+            InkWell(
+              child: Container(
+                height: 100,
+                width: 100,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/image/uploading_image.png"),
+                  ),
                 ),
               ),
+              onTap: () {
+                _excelFileUploadingViewModel.uploadExcelFile();
+              },
             ),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
-            ElevatedButton(
-              onPressed: () {
-                _stateController.setLoading(true);
-                _excelFileUploadingViewModel.uploadExcelFile().then((value) {
-                  _stateController.setLoading(false);
-                });
-              },
-              child: const Text("Upload File"),
-            ),
-            Obx(() {
-              if (_stateController.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (_excelFileUploadingViewModel.state is Rx<Error>) {
+            _excelFileUploadingViewModel.obx(
+              (state) {
                 return Text(
-                    (_excelFileUploadingViewModel.state as Rx<Error>).value.toString());
-              } else if (_excelFileUploadingViewModel.state != null) {
-                final file = _excelFileUploadingViewModel.state!;
-                final fileName = file.map((file) => file.fileName!).join(", ");
-                return Text("$fileName uploaded successfully!");
-              } else {
-                return const SizedBox.shrink();
-              }
-              
-            })
+                  "$state",
+                  textAlign: TextAlign.center,
+                );
+              },
+              onEmpty: const SizedBox.shrink(),
+              onError: (error) => Text(error ?? ""),
+              onLoading: const CircularProgressIndicator(),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            GetBuilder<ExcelFileUploadingViewModel>(
+              builder: (controller) {
+                return ElevatedButton(
+                  onPressed: controller.state == null
+                      ? null
+                      : () {
+                          Get.back(result: controller.state);
+                        },
+                  child: const Text("Extract Data"),
+                );
+              },
+            ),
           ],
         ),
       ),

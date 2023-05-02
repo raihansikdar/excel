@@ -1,11 +1,10 @@
-import 'package:excel_app/view_model/view_model_controller.dart';
+import 'package:excel_app/view_model/excel_data_view_model_controller.dart';
 import 'package:excel_app/views/file_uploading_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomePage extends GetView<ViewModelController> {
-  final ViewModelController viewModelController =
-      Get.put(ViewModelController());
+class HomePage extends GetView<ExcelDataViewModelController> {
+  final viewModelController = Get.put(ExcelDataViewModelController());
   HomePage({super.key});
 
   @override
@@ -15,10 +14,13 @@ class HomePage extends GetView<ViewModelController> {
         title: const Text('Data List'),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 40),
+            padding: const EdgeInsets.only(right: 16),
             child: IconButton(
-              onPressed: () {
-                Get.to(() => FileUploadingPage());
+              onPressed: () async {
+                final excelPath = await Get.to(() => FileUploadingPage());
+                if (excelPath != null) {
+                  viewModelController.getExcelData(excelPath: excelPath);
+                }
               },
               icon: const Icon(Icons.upload_file),
             ),
@@ -27,13 +29,14 @@ class HomePage extends GetView<ViewModelController> {
       ),
       body: viewModelController.obx(
         (state) => ListView.builder(
-          itemCount: viewModelController.excelDataList.length,
+          itemCount: state?.length,
           itemBuilder: (context, index) {
-            final data = viewModelController.excelDataList[index];
+            final data = state?[index];
             return ListTile(
-              title: Text(data.name ?? ''),
+              title: Text(data?.name ?? ''),
               subtitle: Text(
-                  'Email: ${data.email}, \nPhone Number: ${data.phoneNumber},\nDistance: ${data.distance}, \nPostCode: ${data.postcode} '),
+                'Email: ${data?.email}, \nPhone Number: ${data?.phoneNumber},\nDistance: ${data?.distance}, \nPostCode: ${data?.postcode} ',
+              ),
             );
           },
         ),

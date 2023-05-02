@@ -5,7 +5,11 @@ class ExcelDataModel {
   final String? distance;
   final String? postcode;
 
-  ExcelDataModel(
-      {this.name, this.email, this.phoneNumber, this.distance, this.postcode});
+  ExcelDataModel({
+    this.name,
+    this.email,
+    this.phoneNumber,
+    this.distance,
+    this.postcode,
+  });
 }
- 
